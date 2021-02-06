@@ -55,12 +55,29 @@ public class MaxwellPlotGrid extends PlotGrid {
 	public MaxwellPlotGrid() {
 		super(1 + ((NUMPLOTS - 1) / NUMCOLS), NUMCOLS);
 		createPlots();
-		SetData(Particle.H1, 1.0e4);
+		setData(Particle.H1, 1.0e4);
 
+	}
+	
+	/**
+	 * Set the current temperature
+	 * @param t the temp in Kelvin
+	 */
+	public void setTemperature(double t) {
+		_T = t;
+		setData(_particle, _T);
+	}
+	
+	/**
+	 * Get the current temperature being plotted
+	 * @return the current temperature in K
+	 */
+	public double getTemperature() {
+		return _T;
 	}
 
 	// set the data for a particle and a temp
-	public void SetData(Particle particle, double T) {
+	public void setData(Particle particle, double T) {
 		_particle = particle;
 		_T = T;
 		clearData();

@@ -1,13 +1,7 @@
 package fusion;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Random;
 
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 /**
@@ -21,12 +15,8 @@ import javax.swing.SwingUtilities;
 public class Maxwell {
 	
 	//frame for testing
-	private static JFrame _frame;
+	private static MainFrame _frame;
 	
-	//plots for testing
-	private static MaxwellPlotGrid _plotGrid;
-	
-
 	/**
 	 * Get the most probable spped
 	 * @param m the mass of the particle in kg
@@ -154,52 +144,17 @@ public class Maxwell {
 		return mFactor;
 	}
 
-	
-	//create a frame for testing, make it a fraction of the screen
-	private static JFrame makeFrame(double fractionalSize) {
-		final JFrame frame = new JFrame("Maxwell Boltzmann Test");
-
-		// set up what to do if the window is closed
-		WindowAdapter windowAdapter = new WindowAdapter() {
-
-			@Override
-			public void windowClosing(WindowEvent event) {
-				System.exit(1);
-			}
-		};
-
-		frame.addWindowListener(windowAdapter);
-
-		frame.setLayout(new BorderLayout());
-
-		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-		
-		d.width = (int) (fractionalSize * d.width);
-		d.height = (int) (fractionalSize * d.height);
-		frame.setSize(d);
-
-		
-		return frame;
-	}
-	
-	// make the plot grid 
-	private static MaxwellPlotGrid makePlotGrid(JFrame frame) {
-		MaxwellPlotGrid grid = new MaxwellPlotGrid();
-		frame.add(grid, BorderLayout.CENTER);
-		return grid;
-	}
 
 	/**
 	 * Main program for testing.
 	 * @param arg command line arguments (ignored)
 	 */
 	public static void main(String arg[]) {
-		_frame = makeFrame(0.85);
+		_frame = new MainFrame(0.85);
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				_plotGrid = makePlotGrid(_frame);
 				_frame.setVisible(true);
 				_frame.setLocationRelativeTo(null);
 			}
