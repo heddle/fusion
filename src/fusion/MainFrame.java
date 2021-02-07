@@ -10,26 +10,26 @@ import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 
 public class MainFrame extends JFrame {
-	
-	//main tabbed pane
+
+	// main tabbed pane
 	private JTabbedPane _tabbedPane;
-	
-	//plot panel
+
+	// plot panel
 	private PlotPanel _plotPanel;
-	
-	//simulation panel
+
+	// simulation panel
 	private SimPanel _simPanel;
-	
+
 	/**
 	 * Create the main frame with the given fractional size of the screen
+	 * 
 	 * @param fractionalSize
 	 */
 	public MainFrame(double fractionalSize) {
 		super("Fusion Simulation");
-		setLayout(new BorderLayout(4,4));
+		setLayout(new BorderLayout(4, 4));
 		addTabbedPane();
-		
-		
+
 		// set up what to do if the window is closed
 		WindowAdapter windowAdapter = new WindowAdapter() {
 
@@ -39,38 +39,37 @@ public class MainFrame extends JFrame {
 			}
 		};
 		addWindowListener(windowAdapter);
-		
-		//set the fractional size
+
+		// set the fractional size
 		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-		
+
 		d.width = (int) (fractionalSize * d.width);
 		d.height = (int) (fractionalSize * d.height);
 		setSize(d);
 	}
-	
-	
-	// make the plot panel 
+
+	// make the plot panel
 	private void addPlotPanel() {
 		_plotPanel = new PlotPanel();
 		_tabbedPane.add("Plots", _plotPanel);
 	}
-	
-	//add the simulation panel
+
+	// add the simulation panel
 	private void makeSimPanel() {
 		_simPanel = new SimPanel();
 		_tabbedPane.add("Simulation", _simPanel);
 	}
-	
-	//add the tabbed pane to the center
+
+	// add the tabbed pane to the center
 	private void addTabbedPane() {
 		_tabbedPane = new JTabbedPane();
-		
-		//add the sim panel
+
+		// add the sim panel
 		makeSimPanel();
-		
-		//add the plot panel
+
+		// add the plot panel
 		addPlotPanel();
-		
+
 		add(_tabbedPane, BorderLayout.CENTER);
 	}
 

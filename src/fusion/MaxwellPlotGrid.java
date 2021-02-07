@@ -34,9 +34,6 @@ public class MaxwellPlotGrid extends PlotGrid {
 	// total number of columns on the grid
 	private static int NUMCOLS = 3;
 
-	// temperature
-	private static double _T = 10000;
-
 	// particle
 	private static Particle _particle = Particle.H1;
 
@@ -49,40 +46,41 @@ public class MaxwellPlotGrid extends PlotGrid {
 	// the plot canvases
 	private static PlotCanvas[] _canvases = new PlotCanvas[NUMPLOTS];
 
+	// singleton
+	private static MaxwellPlotGrid _instance;
+
 	/**
 	 * Create a grid of plots for testing
 	 */
 	public MaxwellPlotGrid() {
 		super(1 + ((NUMPLOTS - 1) / NUMCOLS), NUMCOLS);
 		createPlots();
-		setData(Particle.H1, 1.0e4);
-
-	}
-	
-	/**
-	 * Set the current temperature
-	 * @param t the temp in Kelvin
-	 */
-	public void setTemperature(double t) {
-		_T = t;
-		setData(_particle, _T);
-	}
-	
-	/**
-	 * Get the current temperature being plotted
-	 * @return the current temperature in K
-	 */
-	public double getTemperature() {
-		return _T;
+		setData();
 	}
 
-	// set the data for a particle and a temp
-	public void setData(Particle particle, double T) {
-		_particle = particle;
-		_T = T;
+	/**
+	 * public access to the singleton
+	 * 
+	 * @return the singleton
+	 */
+	public static MaxwellPlotGrid instance() {
+
+		if (_instance == null) {
+			_instance = new MaxwellPlotGrid();
+		}
+
+		return _instance;
+	}
+
+	/**
+	 * Set the data for the simulation temperature
+	 */
+	public void setData() {
 		clearData();
-		
-		//reset histo data
+
+		double T = Simulation.getTemperature();
+
+		// reset histo data
 		_canvases[1].setDataSet(getHistoDataSet());
 
 		for (int index = 0; index < NUMPLOTS; index++) {
@@ -90,17 +88,17 @@ public class MaxwellPlotGrid extends PlotGrid {
 			fillData(index);
 			_canvases[index].setWorldSystem();
 		}
-		
-		//some extra text
-		double vmp = Maxwell.mostProbable(particle.m, T);
-		double vavg = Maxwell.average(particle.m, T);
-		double vrms = Maxwell.rms(particle.m, T);
-		
+
+		// some extra text
+		double vmp = Maxwell.mostProbable(_particle.m, T);
+		double vavg = Maxwell.average(_particle.m, T);
+		double vrms = Maxwell.rms(_particle.m, T);
+
+		String ts = String.format("T = %-10.2e K", T);
 		String smp = String.format("Vmp = %-10.4e m/s", vmp);
 		String savg = String.format("Vavg = %-10.4e m/s", vavg);
 		String srms = String.format("Vrms = %-10.4e m/s", vrms);
-		_canvases[0].getParameters().setExtraStrings(smp, savg, srms);
-
+		_canvases[0].getParameters().setExtraStrings(ts, smp, savg, srms);
 	}
 
 	// clear the data from all the plots
@@ -135,6 +133,8 @@ public class MaxwellPlotGrid extends PlotGrid {
 
 		DataSet ds = canvas.getDataSet();
 
+		double T = Simulation.getTemperature();
+
 		switch (index) {
 		case 0:
 
@@ -144,8 +144,7 @@ public class MaxwellPlotGrid extends PlotGrid {
 			double maxwell[] = new double[numPoints];
 			double normal[] = new double[numPoints];
 
-			double mFactor = Maxwell.getMFactor(_particle.m, _T, speed, maxwell, normal);
-			System.err.println("MFactor: " + mFactor);
+			double mFactor = Maxwell.getMFactor(_particle.m, T, speed, maxwell, normal);
 
 			for (int i = 0; i < numPoints; i++) {
 				try {
@@ -158,12 +157,12 @@ public class MaxwellPlotGrid extends PlotGrid {
 			break;
 
 		case 1:
-			mFactor = Maxwell.getMFactor(_particle.m, _T);
-			numPoints =  100000;
+			mFactor = Maxwell.getMFactor(_particle.m, T);
+			numPoints = 100000;
 			Random rand = new Random();
-			
+
 			for (int i = 0; i < numPoints; i++) {
-				double v = Maxwell.randomSpeed(rand, _particle.m, _T, mFactor);
+				double v = Maxwell.randomSpeed(rand, _particle.m, T, mFactor);
 				try {
 					ds.add(v);
 				} catch (DataSetException e) {
@@ -236,24 +235,23 @@ public class MaxwellPlotGrid extends PlotGrid {
 
 		return null;
 	}
-	
+
 	private DataSet getHistoDataSet() {
-		double vmp = Maxwell.mostProbable(_particle.m, _T);
+		double T = Simulation.getTemperature();
+
+		double vmp = Maxwell.mostProbable(_particle.m, T);
 		HistoData h1 = new HistoData("Speeds", 0, 3 * vmp, 200);
 		try {
 			DataSet ds = new DataSet(h1);
-			
-			
+
 			ds.getCurveStyle(0).setFillColor(new Color(196, 196, 196, 64));
 			ds.getCurveStyle(0).setBorderColor(Color.black);
 			ds.getCurveStyle(0).setBorderColor(Color.black);
 			ds.getCurve(0).getFit().setFitType(FitType.NOLINE);
 
-			
 			return ds;
-			
+
 		} catch (DataSetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -320,16 +318,21 @@ public class MaxwellPlotGrid extends PlotGrid {
 	// set the plot title based on index
 	private void setPlotTitle(int index) {
 
+		double T = Simulation.getTemperature();
+
 		PlotCanvas canvas = _canvases[index];
 		PlotParameters params = canvas.getParameters();
 
 		switch (index) {
 		case 0:
-			params.setPlotTitle("<html>Maxwell Boltzman Distribution  " + _particle.symbol + "  T = " + _T + "K");
+
+			String ts = String.format("   T = %-10.2e K", T);
+			params.setPlotTitle("<html>Maxwell Boltzman Distribution  " + _particle.symbol + ts);
+
 			break;
 
 		case 1:
-			params.setPlotTitle("<html>Speed Frequency Histogram  " + _particle.symbol + "  T = " + _T + "K");
+			params.setPlotTitle("<html>Speed Frequency Histogram  " + _particle.symbol + "  T = " + T + "K");
 			break;
 
 		}

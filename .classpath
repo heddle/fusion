@@ -11,5 +11,9 @@
 	<classpathentry kind="lib" path="lib/numRec.jar"/>
 	<classpathentry kind="lib" path="lib/splot.jar"/>
 	<classpathentry kind="lib" path="lib/splotimages.jar"/>
+	<classpathentry kind="lib" path="lib/bCNU3D.jar"/>
+	<classpathentry kind="lib" path="lib/bCNU.jar"/>
+	<classpathentry kind="lib" path="lib/JOGL/jogl-all.jar"/>
+	<classpathentry kind="lib" path="lib/JOGL/gluegen-rt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
